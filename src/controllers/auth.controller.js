@@ -1,13 +1,19 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const { sql } = require('../config/db');
+const { executeQuery } = require('../config/db');
 
-const generateTokens = (userId) => {
-    const accessToken = jwt.sign({ userId }, process.env.JWT_SECRET, {
+const generateTokens = (userId, role) => {
+    const accessToken = jwt.sign({ 
+        userId,
+        role
+    }, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRES_IN
     });
     
-    const refreshToken = jwt.sign({ userId }, process.env.JWT_REFRESH_SECRET, {
+    const refreshToken = jwt.sign({ 
+        userId,
+        role
+    }, process.env.JWT_REFRESH_SECRET, {
         expiresIn: process.env.JWT_REFRESH_EXPIRES_IN
     });
     
@@ -18,29 +24,34 @@ exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
         
-        const request = await sql.query`
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Email and password are required' });
+        }
+        
+        const result = await executeQuery(`
             SELECT id, password, role 
             FROM users 
-            WHERE email = ${email}
-        `;
+            WHERE email = @email
+        `, { parameters: { email } });
+        
+        const request = result;
         
         if (request.recordset.length === 0) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
         
         const user = request.recordset[0];
-        const isValidPassword = await bcrypt.compare(password, user.password);
+        const isPasswordValid = await bcrypt.compare(password, user.password);
         
-        if (!isValidPassword) {
+        if (!isPasswordValid) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
         
-        const { accessToken, refreshToken } = generateTokens(user.id);
+        const tokens = generateTokens(user.id, user.role);
         
-        res.json({
-            success: true,
-            accessToken,
-            refreshToken,
+        return res.json({
+            accessToken: tokens.accessToken,
+            refreshToken: tokens.refreshToken,
             user: {
                 id: user.id,
                 email,
@@ -49,7 +60,7 @@ exports.login = async (req, res) => {
         });
     } catch (error) {
         console.error('Login error:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
@@ -82,7 +93,6 @@ exports.refreshToken = async (req, res) => {
 
 exports.logout = async (req, res) => {
     try {
-        // Aquí podrías implementar lógica para invalidar el token si lo necesitas
         res.json({ success: true, message: 'Logged out successfully' });
     } catch (error) {
         console.error('Logout error:', error);

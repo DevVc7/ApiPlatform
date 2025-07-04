@@ -1,7 +1,43 @@
 const express = require('express');
 const router = express.Router();
-const { auth, authSuperAdmin } = require('../middleware/auth.middleware');
+const { auth, authSuperAdmin, ROLES, verifyRole } = require('../middleware/auth.middleware');
+const { authorize } = require('../middleware/auth.middleware');
 const adminController = require('../controllers/admin.controller');
+
+// Middleware para verificar roles ADMIN o SUPER_ADMIN
+const requireAdmin = verifyRole([ROLES.ADMIN, ROLES.SUPER_ADMIN]);
+
+// ... (resto del código existente)
+
+// Rutas de administración de usuarios
+/**
+ * @swagger
+ * /api/admin:
+ *   get:
+ *     summary: Obtener lista de administradores
+ *     tags: [Administración]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de administradores
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/AdminUserResponse'
+ *       403:
+ *         description: No autorizado
+ *       500:
+ *         description: Error interno del servidor
+ */
+router.get('/', auth, requireAdmin, adminController.getAdmins);
 
 /**
  * @swagger
@@ -148,7 +184,7 @@ const adminController = require('../controllers/admin.controller');
  *       403:
  *         description: Prohibido (no es SuperAdmin).
  */
-router.get('/', auth, authSuperAdmin, adminController.getAdmins);
+router.get('/', auth, requireAdmin, adminController.getAdmins);
 
 /**
  * @swagger

@@ -1,6 +1,13 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const corsOptions = {
+    origin: process.env.CORS_ORIGIN,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: process.env.CORS_ALLOW_CREDENTIALS === 'true',
+    optionsSuccessStatus: 200
+};
 const morgan = require('morgan');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocs = require('../config/swagger.config');
@@ -10,11 +17,16 @@ const educationRoutes = require('./routes/education.routes');
 const adminRoutes = require('./routes/admin.routes');
 const reportsRoutes = require('./routes/reports.routes');
 const questionsRoutes = require('./routes/questions.routes');
+const studentRoutes = require('./routes/student.routes');
 
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Credentials', 'true');
+    next();
+});
 app.use(express.json());
 app.use(morgan('dev'));
 
@@ -33,6 +45,7 @@ async function initializeApp() {
         app.use('/api/admin', adminRoutes);
         app.use('/api/reports', reportsRoutes);
         app.use('/api/questions', questionsRoutes);
+        app.use('/api/students', studentRoutes);
         
         // Swagger documentation
         app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));

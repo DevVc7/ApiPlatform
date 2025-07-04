@@ -1,14 +1,16 @@
 const adminService = require('../services/admin.service');
 const { ROLES } = require('../middleware/auth.middleware');
+const { executeQuery } = require('../config/db');
 
 class AdminController {
     async getAdmins(req, res) {
         try {
-            const admins = await sql.query`
+            // console.log('Get admins');
+            const admins = await executeQuery(`
                 SELECT id, name, email, role, created_at 
                 FROM users 
-                WHERE role IN (${ROLES.ADMIN}, ${ROLES.SUPER_ADMIN})
-            `;
+                WHERE role IN (@adminRole, @superAdminRole)
+            `, { parameters: { adminRole: ROLES.ADMIN, superAdminRole: ROLES.SUPER_ADMIN } });
             
             res.json({
                 success: true,
@@ -30,9 +32,9 @@ class AdminController {
             }
             
             // Verificar si el email ya existe
-            const existingUser = await sql.query`
+            const existingUser = await executeQuery(`
                 SELECT id FROM users WHERE email = ${email}
-            `;
+            `);
             
             if (existingUser.recordset.length > 0) {
                 return res.status(400).json({ message: 'Email already exists' });

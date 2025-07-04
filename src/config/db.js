@@ -38,12 +38,32 @@ const connectDB = async () => {
     }
 };
 
-const executeQuery = async (query) => {
+async function executeQuery(query, options) {
     try {
-        if (!pool) {
-            throw new Error('Database not initialized. Please call connectDB() first.');
-        }
+        const pool = await getPool();
         const request = pool.request();
+        
+        // Agregar parámetros si existen
+        if (options && options.parameters) {
+            for (const [key, value] of Object.entries(options.parameters)) {
+                // Definir tipo de dato según el valor
+                let type;
+                if (typeof value === 'number') {
+                    type = sql.Int;
+                } else if (typeof value === 'string') {
+                    type = sql.NVarChar;
+                } else if (value instanceof Date) {
+                    type = sql.DateTime;
+                } else if (typeof value === 'boolean') {
+                    type = sql.Bit;
+                } else {
+                    throw new Error(`Tipo de dato no soportado para el parámetro ${key}`);
+                }
+                
+                request.input(key, type, value);
+            }
+        }
+        
         const result = await request.query(query);
         return result;
     } catch (error) {
@@ -59,6 +79,11 @@ const getPool = () => {
     return pool;
 };
 
-module.exports = { connectDB, executeQuery, getPool };
+module.exports = {
+    connectDB,
+    executeQuery,
+    getPool,
+    sql
+};
 
 
