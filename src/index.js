@@ -40,7 +40,7 @@ async function initializeApp() {
         await examController.initialize();
         
         // Initialize routes
-        app.use('/api/auth', authRoutes);
+        app.use('/auth', authRoutes);
         app.use('/api/education', educationRoutes);
         app.use('/api/admin', adminRoutes);
         app.use('/api/reports', reportsRoutes);

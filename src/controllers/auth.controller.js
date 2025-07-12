@@ -34,6 +34,8 @@ exports.login = async (req, res) => {
             WHERE email = @email
         `, { parameters: { email } });
         
+        console.log("result da" , result)
+
         const request = result;
         
         if (request.recordset.length === 0) {

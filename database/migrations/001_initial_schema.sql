@@ -83,3 +83,28 @@ CREATE TABLE learning_patterns (
     FOREIGN KEY (subject_id) REFERENCES subjects(id),
     FOREIGN KEY (subcategory_id) REFERENCES subcategories(id)
 );
+
+
+CREATE TABLE student (
+    id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY DEFAULT NEWID(),
+    grade VARCHAR(50) NULL,
+    progress INT NOT NULL DEFAULT 0,
+    lastActive VARCHAR(50) NULL,
+    code VARCHAR(200) NULL,
+    note NVARCHAR(500) NULL,
+    users_id UNIQUEIDENTIFIER NOT NULL,
+    created_at DATETIME2(7) NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME2(7) NOT NULL DEFAULT GETDATE(),
+    FOREIGN KEY (users_id) REFERENCES users (id)
+);
+
+CREATE TABLE student_subjects (
+    id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY DEFAULT NEWID(),
+    subject_id UNIQUEIDENTIFIER NOT NULL,
+    student_id UNIQUEIDENTIFIER NOT NULL,
+    progress INT NOT NULL DEFAULT 0,
+    created_at DATETIME2(7) NOT NULL DEFAULT GETDATE(),
+    updated_at DATETIME2(7) NOT NULL DEFAULT GETDATE(),
+    FOREIGN KEY (student_id) REFERENCES student(id),
+    FOREIGN KEY (subject_id) REFERENCES subjects(id)
+);

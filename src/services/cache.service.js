@@ -1,17 +1,17 @@
-const Redis = require('ioredis');
-const { promisify } = require('util');
+// const Redis = require('ioredis');
+// const { promisify } = require('util');
 
-// Configuración de Redis
-const redis = new Redis({
-    host: process.env.REDIS_HOST || 'localhost',
-    port: process.env.REDIS_PORT || 6379,
-    password: process.env.REDIS_PASSWORD
-});
+// // Configuración de Redis
+// const redis = new Redis({
+//     host: process.env.REDIS_HOST || 'localhost',
+//     port: process.env.REDIS_PORT || 6379,
+//     password: process.env.REDIS_PASSWORD
+// });
 
-// Promisify Redis methods
-const getAsync = promisify(redis.get).bind(redis);
-const setAsync = promisify(redis.set).bind(redis);
-const delAsync = promisify(redis.del).bind(redis);
+// // Promisify Redis methods
+// const getAsync = promisify(redis.get).bind(redis);
+// const setAsync = promisify(redis.set).bind(redis);
+// const delAsync = promisify(redis.del).bind(redis);
 
 class CacheService {
     constructor() {
