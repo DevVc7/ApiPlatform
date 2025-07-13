@@ -12,11 +12,11 @@ BEGIN
     );
 
     -- Insertar usuario administrador por defecto
-    INSERT INTO users (email, password, role, name)
-    VALUES (
-        'admin@example.com',
-        '$2a$10$C/BFNGi4kLzxFYJybIX3j.OhUc5wuACd28GoK.z5Zr89Ut2TeEMXS',
-        'admin',
-        'Admin'
-    );
+    -- INSERT INTO users (email, password, role, name)
+    -- VALUES (
+    --     'admin@example.com',
+    --     '$2a$10$C/BFNGi4kLzxFYJybIX3j.OhUc5wuACd28GoK.z5Zr89Ut2TeEMXS',
+    --     'admin',
+    --     'Admin'
+    -- );
 END;
