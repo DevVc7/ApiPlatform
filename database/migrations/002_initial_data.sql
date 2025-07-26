@@ -3,8 +3,8 @@ DECLARE @MathId UNIQUEIDENTIFIER = NEWID();
 DECLARE @CommId UNIQUEIDENTIFIER = NEWID();
 
 INSERT INTO subjects (id, name, description) VALUES
-(@MathId, 'Matemática', 'Contenido de matemáticas'),
-(@CommId, 'Comunicación', 'Contenido de comunicación');
+(@MathId, 'Matematica', 'Contenido de matemáticas'),
+(@CommId, 'Comunicacion', 'Contenido de comunicación');
 
 -- Insertar subcategorías de Matemática
 DECLARE @AlgebraId UNIQUEIDENTIFIER = NEWID();
